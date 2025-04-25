@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartman Yönetim Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Apartman Yönetim Sistemi</h1>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Apartmanlar</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group" id="apartment-list">
+                            <!-- Apartman listesi buraya gelecek -->
+                        </ul>
+                        <button class="btn btn-primary mt-3" data-bs-toggle="modal"
+                            data-bs-target="#addApartmentModal">Yeni Apartman Ekle</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Genel Bakış: <span id="current-apartment">Lütfen bir apartman seçin</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Toplam Gelir</h5>
+                                        <h3 id="total-income">0 ₺</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Toplam Gider</h5>
+                                        <h3 id="total-expense">0 ₺</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Bakiye</h5>
+                                        <h3 id="balance">0 ₺</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="incomes-tab" data-bs-toggle="tab" data-bs-target="#incomes"
+                            type="button" role="tab">Gelirler</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses"
+                            type="button" role="tab">Giderler</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="incomes" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Gelir Listesi</h5>
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addIncomeModal"
+                                    id="add-income-btn" disabled>Gelir Ekle</button>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Tarih</th>
+                                            <th>Tür</th>
+                                            <th>Açıklama</th>
+                                            <th>Tutar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="income-table">
+                                        <!-- Gelirler buraya gelecek -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="expenses" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Gider Listesi</h5>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addExpenseModal"
+                                    id="add-expense-btn" disabled>Gider Ekle</button>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Tarih</th>
+                                            <th>Tür</th>
+                                            <th>Açıklama</th>
+                                            <th>Tutar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expense-table">
+                                        <!-- Giderler buraya gelecek -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apartman Ekleme Modal -->
+    <div class="modal fade" id="addApartmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Apartman Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="apartment-form">
+                        <div class="mb-3">
+                            <label for="apartment-name" class="form-label">Apartman Adı</label>
+                            <input type="text" class="form-control" id="apartment-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apartment-address" class="form-label">Adres</label>
+                            <textarea class="form-control" id="apartment-address" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="save-apartment">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gelir Ekleme Modal -->
+    <div class="modal fade" id="addIncomeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Gelir Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="income-form">
+                        <div class="mb-3">
+                            <label for="income-type" class="form-label">Gelir Türü</label>
+                            <select class="form-select" id="income-type" required>
+                                <option value="AIDAT">Aidat</option>
+                                <option value="KIRA">Kira</option>
+                                <option value="DIGER">Diğer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="income-description" class="form-label">Açıklama</label>
+                            <input type="text" class="form-control" id="income-description" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="income-amount" class="form-label">Tutar (₺)</label>
+                            <input type="number" class="form-control" id="income-amount" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="income-date" class="form-label">Tarih</label>
+                            <input type="date" class="form-control" id="income-date" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-success" id="save-income">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gider Ekleme Modal -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Gider Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="expense-form">
+                        <div class="mb-3">
+                            <label for="expense-type" class="form-label">Gider Türü</label>
+                            <select class="form-select" id="expense-type" required>
+                                <option value="ELEKTRIK">Elektrik</option>
+                                <option value="SU">Su</option>
+                                <option value="TEMIZLIK_MALZEME">Temizlik Malzemesi</option>
+                                <option value="BAKIM_ONARIM">Bakım Onarım</option>
+                                <option value="TESISATCI">Tesisatçı</option>
+                                <option value="TEMIZLIKCI">Temizlikçi</option>
+                                <option value="DIGER">Diğer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-description" class="form-label">Açıklama</label>
+                            <input type="text" class="form-control" id="expense-description" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-amount" class="form-label">Tutar (₺)</label>
+                            <input type="number" class="form-control" id="expense-amount" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-date" class="form-label">Tarih</label>
+                            <input type="date" class="form-control" id="expense-date" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" id="save-expense">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API URL
+        const API_URL = 'http://localhost:8000';
+        let currentApartmentId = null;
+
+        // Sayfa yüklendiğinde apartmanları getir
+        document.addEventListener('DOMContentLoaded', () => {
+            getApartments();
+
+            // Bugünün tarihini form alanlarına ekle
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('income-date').value = today;
+            document.getElementById('expense-date').value = today;
+
+            // Event listeners
+            document.getElementById('save-apartment').addEventListener('click', addApartment);
+            document.getElementById('save-income').addEventListener('click', addIncome);
+            document.getElementById('save-expense').addEventListener('click', addExpense);
+        });
+
+        // Apartmanları getir
+        async function getApartments() {
+            try {
+                const response = await fetch(`${API_URL}/apartments/`);
+                const apartments = await response.json();
+
+                const apartmentList = document.getElementById('apartment-list');
+                apartmentList.innerHTML = '';
+
+                if (apartments.length === 0) {
+                    apartmentList.innerHTML = '<li class="list-group-item">Henüz apartman yok</li>';
+                    return;
+                }
+
+                apartments.forEach(apartment => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item list-group-item-action';
+                    li.textContent = apartment.name;
+                    li.onclick = () => selectApartment(apartment.id);
+                    apartmentList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Apartmanlar yüklenirken hata:', error);
+                alert('Apartmanlar yüklenirken bir hata oluştu!');
+            }
+        }
+
+        // Apartman ekle
+        async function addApartment() {
+            const name = document.getElementById('apartment-name').value;
+            const address = document.getElementById('apartment-address').value;
+
+            if (!name || !address) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/apartments/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, address })
+                });
+
+                if (response.ok) {
+                    getApartments();
+                    document.getElementById('apartment-name').value = '';
+                    document.getElementById('apartment-address').value = '';
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addApartmentModal'));
+                    modal.hide();
+                } else {
+                    const error = await response.json();
+                    alert(`Hata: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Apartman eklenirken hata:', error);
+                alert('Apartman eklenirken bir hata oluştu!');
+            }
+        }
+
+        // Apartman seç
+        async function selectApartment(apartmentId) {
+            currentApartmentId = apartmentId;
+
+            try {
+                const response = await fetch(`${API_URL}/apartments/${apartmentId}`);
+                const apartment = await response.json();
+
+                document.getElementById('current-apartment').textContent = apartment.name;
+                document.getElementById('add-income-btn').disabled = false;
+                document.getElementById('add-expense-btn').disabled = false;
+
+                // Özet bilgileri getir
+                getSummary(apartmentId);
+
+                // Gelir ve giderleri getir
+                getIncomes(apartmentId);
+                getExpenses(apartmentId);
+
+                // Seçili apartmanı vurgula
+                const apartmentItems = document.querySelectorAll('#apartment-list .list-group-item');
+                apartmentItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.textContent === apartment.name) {
+                        item.classList.add('active');
+                    }
+                });
+            } catch (error) {
+                console.error('Apartman bilgisi yüklenirken hata:', error);
+                alert('Apartman bilgisi yüklenirken bir hata oluştu!');
+            }
+        }
+
+        // Özet bilgileri getir
+        async function getSummary(apartmentId) {
+            try {
+                const response = await fetch(`${API_URL}/apartments/${apartmentId}/summary`);
+                const summary = await response.json();
+
+                document.getElementById('total-income').textContent = `${summary.total_income.toFixed(2)} ₺`;
+                document.getElementById('total-expense').textContent = `${summary.total_expense.toFixed(2)} ₺`;
+                document.getElementById('balance').textContent = `${summary.balance.toFixed(2)} ₺`;
+            } catch (error) {
+                console.error('Özet bilgisi yüklenirken hata:', error);
+                alert('Özet bilgisi yüklenirken bir hata oluştu!');
+            }
+        }
+
+        // Gelir listesini getir
+        async function getIncomes(apartmentId) {
+            try {
+                const response = await fetch(`${API_URL}/apartments/${apartmentId}/incomes`);
+                const incomes = await response.json();
+
+                const incomeTable = document.getElementById('income-table');
+                incomeTable.innerHTML = '';
+
+                if (incomes.length === 0) {
+                    incomeTable.innerHTML = '<tr><td colspan="4" class="text-center">Kayıtlı gelir bulunmamaktadır</td></tr>';
+                    return;
+                }
+
+                incomes.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                incomes.forEach(income => {
+                    const row = document.createElement('tr');
+
+                    const dateCell = document.createElement('td');
+                    dateCell.textContent = new Date(income.date).toLocaleDateString('tr-TR');
+                    row.appendChild(dateCell);
+
+                    const typeCell = document.createElement('td');
+                    typeCell.textContent = getIncomeTypeName(income.income_type);
+                    row.appendChild(typeCell);
+
+                    const descCell = document.createElement('td');
+                    descCell.textContent = income.description;
+                    row.appendChild(descCell);
+
+                    const amountCell = document.createElement('td');
+                    amountCell.textContent = `${income.amount.toFixed(2)} ₺`;
+                    amountCell.className = 'text-success fw-bold';
+                    row.appendChild(amountCell);
+
+                    incomeTable.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Gelirler yüklenirken hata:', error);
+                alert('Gelirler yüklenirken bir hata oluştu!');
+            }
+        }
+
+        // Gider listesini getir
+        async function getExpenses(apartmentId) {
+            try {
+                const response = await fetch(`${API_URL}/apartments/${apartmentId}/expenses`);
+                const expenses = await response.json();
+
+                const expenseTable = document.getElementById('expense-table');
+                expenseTable.innerHTML = '';
+
+                if (expenses.length === 0) {
+                    expenseTable.innerHTML = '<tr><td colspan="4" class="text-center">Kayıtlı gider bulunmamaktadır</td></tr>';
+                    return;
+                }
+
+                expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                expenses.forEach(expense => {
+                    const row = document.createElement('tr');
+
+                    const dateCell = document.createElement('td');
+                    dateCell.textContent = new Date(expense.date).toLocaleDateString('tr-TR');
+                    row.appendChild(dateCell);
+
+                    const typeCell = document.createElement('td');
+                    typeCell.textContent = getExpenseTypeName(expense.expense_type);
+                    row.appendChild(typeCell);
+
+                    const descCell = document.createElement('td');
+                    descCell.textContent = expense.description;
+                    row.appendChild(descCell);
+
+                    const amountCell = document.createElement('td');
+                    amountCell.textContent = `${expense.amount.toFixed(2)} ₺`;
+                    amountCell.className = 'text-danger fw-bold';
+                    row.appendChild(amountCell);
+
+                    expenseTable.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Giderler yüklenirken hata:', error);
+                alert('Giderler yüklenirken bir hata oluştu!');
+            }
+        }
+
+        // Gelir ekle
+        async function addIncome() {
+            if (!currentApartmentId) {
+                alert('Lütfen önce bir apartman seçin!');
+                return;
+            }
+
+            const income_type = document.getElementById('income-type').value;
+            const description = document.getElementById('income-description').value;
+            const amount = parseFloat(document.getElementById('income-amount').value);
+            const date = document.getElementById('income-date').value;
+
+            if (!income_type || !description || isNaN(amount) || !date) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/incomes/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apartment_id: currentApartmentId,
+                        income_type,
+                        description,
+                        amount,
+                        date: new Date(date).toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    // Formları sıfırla
+                    document.getElementById('income-description').value = '';
+                    document.getElementById('income-amount').value = '';
+
+                    // Güncel verileri yükle
+                    getIncomes(currentApartmentId);
+                    getSummary(currentApartmentId);
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addIncomeModal'));
+                    modal.hide();
+                } else {
+                    const error = await response.json();
+                    alert(`Hata: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Gelir eklenirken hata:', error);
+                alert('Gelir eklenirken bir hata oluştu!');
+            }
+        }
+
+        // Gider ekle
+        async function addExpense() {
+            if (!currentApartmentId) {
+                alert('Lütfen önce bir apartman seçin!');
+                return;
+            }
+
+            const expense_type = document.getElementById('expense-type').value;
+            const description = document.getElementById('expense-description').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            const date = document.getElementById('expense-date').value;
+
+            if (!expense_type || !description || isNaN(amount) || !date) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/expenses/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apartment_id: currentApartmentId,
+                        expense_type,
+                        description,
+                        amount,
+                        date: new Date(date).toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    // Formları sıfırla
+                    document.getElementById('expense-description').value = '';
+                    document.getElementById('expense-amount').value = '';
+
+                    // Güncel verileri yükle
+                    getExpenses(currentApartmentId);
+                    getSummary(currentApartmentId);
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addExpenseModal'));
+                    modal.hide();
+                } else {
+                    const error = await response.json();
+                    alert(`Hata: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Gider eklenirken hata:', error);
+                alert('Gider eklenirken bir hata oluştu!');
+            }
+        }
+
+        // Gelir türünü okunaklı formata çevir
+        function getIncomeTypeName(type) {
+            const types = {
+                'AIDAT': 'Aidat',
+                'KIRA': 'Kira',
+                'DIGER': 'Diğer'
+            };
+            return types[type] || type;
+        }
+
+        // Gider türünü okunaklı formata çevir
+        function getExpenseTypeName(type) {
+            const types = {
+                'ELEKTRIK': 'Elektrik',
+                'SU': 'Su',
+                'TEMIZLIK_MALZEME': 'Temizlik Malzemesi',
+                'BAKIM_ONARIM': 'Bakım Onarım',
+                'TESISATCI': 'Tesisatçı',
+                'TEMIZLIKCI': 'Temizlikçi',
+                'DIGER': 'Diğer'
+            };
+            return types[type] || type;
+        }
+    </script>
+</body>
+
+</html>
